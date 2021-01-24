@@ -13,7 +13,14 @@ class Game {
 
     @GetMapping("/")
     String Info() {
-        return "Would you like to have a game of CHESS";
+        return "Would you like to have a game of CHESS.\n" +
+                "Application: https://ak-chess.herokuapp.com/\n" +
+                "Repository: https://github.com/akgarg0/chess\n" +
+                "Online Resume: https://www.ashwanigarg.com\n" +
+                "*Note:*\n" +
+                "*1. First Request to Application may take some time.*\n" +
+                "*2. All the requests are required to sent on 'post' method with body as 'plain text'*\n";
+
     }
 
     @PostMapping(value = "/", consumes = "text/plain", produces = "text/plain")
