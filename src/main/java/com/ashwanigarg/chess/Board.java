@@ -90,6 +90,16 @@ public class Board {
         }
     }
 
+    boolean kingSideCastling(){
+        Piece king = board[4][whiteTurn?0:7].getPiece();
+        Piece Rook = board[7][whiteTurn?0:7].getPiece();
+
+        if (king.name() != 'K' || Rook.name() != 'R')
+            return false;
+
+        return true;
+    }
+
     boolean newMove(char pieceChar, boolean capture, char xChar, int y, boolean check, boolean pawnPromotion, char promotedPieceChar, char ambiguityResolveChar ){
         int[] pieceList = {'K','Q','B','N','R','P'};
 

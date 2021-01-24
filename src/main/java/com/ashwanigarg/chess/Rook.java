@@ -1,9 +1,15 @@
 package com.ashwanigarg.chess;
 
 public class Rook extends Piece {
+    private boolean firstMove;
     public Rook(boolean white)
     {
         super(white);
+        firstMove = true;
+    }
+
+    boolean canCastle(){
+        return firstMove;
     }
 
     @Override
@@ -32,6 +38,7 @@ public class Rook extends Piece {
             return false;
         }
 
+        firstMove = false;
         return true;
     }
 }

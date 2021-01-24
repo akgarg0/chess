@@ -2,9 +2,15 @@ package com.ashwanigarg.chess;
 
 
 public class King extends Piece {
+    private boolean firstMove;
     public King(boolean white)
     {
         super(white);
+        firstMove = true;
+    }
+
+    boolean canCastle(){
+        return firstMove;
     }
 
     @Override
@@ -20,7 +26,7 @@ public class King extends Piece {
         if (x + y == 1) {
             return true;
         }
-
+        firstMove = false;
         return false;
     }
 }
