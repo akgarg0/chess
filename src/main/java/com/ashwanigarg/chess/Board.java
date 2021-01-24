@@ -71,6 +71,14 @@ public class Board {
         return null;
     }
 
+    static int fileToNumber(char file){
+        int number = file - 96;
+        if (number < 1 || number > 8 ){
+            return 0;
+        }
+        return number;
+    }
+
     Board(){
         whiteTurn = true;
         board = new Spot[8][8];
@@ -82,57 +90,31 @@ public class Board {
         }
     }
 
-    public Piece getPiece(int x ,int y){
-        return board[x][y].getPiece();
-    }
-
-    public Spot getSpot(boolean white, char pieceChar, int ambiguityResolverPositionX){
-        for (int i = 0 ; i < 8; i++) {
-            if (ambiguityResolverPositionX != 0){
-                i = ambiguityResolverPositionX - 1;
-            }
-            for (int j = 0 ; j < 8; j++) {
-                if (board[i][j].getPiece().name() == pieceChar && board[i][j].getPiece().isWhite() == white){
-                    return board[i][j];
-                }
-            }
-            if (ambiguityResolverPositionX != 0){
-               break;
-            }
-        }
-        return null;
-    }
-
-    boolean newMove(final int pieceChar, boolean capture, char xChar, int y, boolean check, boolean pawnPromotion, char promotedPieceChar, char ambiguityResolveChar ){
+    boolean newMove(char pieceChar, boolean capture, char xChar, int y, boolean check, boolean pawnPromotion, char promotedPieceChar, char ambiguityResolveChar ){
         int[] pieceList = {'K','Q','B','N','R','P'};
 
         if (!IntStream.of(pieceList).anyMatch(x -> x == pieceChar)){
             return false;
         }
 
-        int x = xChar - 96;
-        if (x < 1 || x > 8 ){
+        int x = fileToNumber(xChar);
+        if (x == 0){
             return false;
         }
         if (y < 1 || y > 8 ){
             return false;
         }
 
-
-        if (promotedPieceChar != ' ' && (!pieceList.toString().contains(Character.toString(promotedPieceChar)))){
+        if (promotedPieceChar != ' ' && (!IntStream.of(pieceList).anyMatch(z -> z == promotedPieceChar)) || promotedPieceChar == 'K'){
             return false;
         }
 
-        int ambiguityResolverPositionX = ambiguityResolveChar - 96;
-        if (ambiguityResolverPositionX < 1 || ambiguityResolverPositionX > 8 ){
-            ambiguityResolverPositionX = 0;
-//            return false;
-        }
+        int ambiguityResolverPositionX = fileToNumber(xChar);
 
-        Spot startSpot = getSpot(whiteTurn, (char)pieceChar, ambiguityResolverPositionX);
-
-        if (startSpot == null){
-            return false;
+        if(pawnPromotion){
+            if (y !=8 || pieceChar != 'P'){
+                return false;
+            }
         }
 
         Spot endSpot = board[x-1][y-1];
@@ -149,13 +131,28 @@ public class Board {
             }
         }
 
-        if(pawnPromotion){
-            if (y !=8 || pieceChar != 'P'){
-                return false;
+        Spot startSpot = board[0][0];
+        boolean canMove = false;
+
+        for (int i = 0 ; i < 8; i++) {
+            if (ambiguityResolverPositionX != 0){
+                i = ambiguityResolverPositionX - 1;
+            }
+            for (int j = 0 ; j < 8; j++) {
+                if ( board[i][j].getPiece()!=null && board[i][j].getPiece().name() == pieceChar && board[i][j].getPiece().isWhite() == whiteTurn){
+                    startSpot = board[i][j];
+                    if (startSpot.getPiece().canMove(this, startSpot, endSpot)){
+                        canMove = true;
+                        break;
+                    }
+                }
+            }
+            if (ambiguityResolverPositionX != 0){
+                break;
             }
         }
 
-        if (!startSpot.getPiece().canMove(this, startSpot, endSpot)){
+        if (!canMove){
             return false;
         }
 

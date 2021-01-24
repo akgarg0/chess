@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 class Game {
     Board chessBoard;
+    Player playerOnBlack;
+    Player playerOnWhite;
 
     @GetMapping("/")
     String Info() {
@@ -18,10 +20,13 @@ class Game {
     String Play(@RequestBody String body) {
         boolean kCastling = false;
         boolean qCastling = false;
+        Player currentPlayer = playerOnBlack;
 
         switch (body) {
             case "START":
                 chessBoard = new Board();
+                playerOnWhite = new Player(chessBoard, true);
+                playerOnBlack = new Player(chessBoard, false);
                 return "READY";
             case "0-0":
                 kCastling = true;
@@ -34,6 +39,9 @@ class Game {
         if (chessBoard == null) {
             return "Kindly Start Game!";
         }
+
+        if (chessBoard.whiteTurn)
+            currentPlayer = playerOnWhite;
 
         char pieceChar = ' ';
         boolean capture = false;
