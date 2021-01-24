@@ -13,6 +13,10 @@ public class King extends Piece {
         return firstMove;
     }
 
+    void resetCastling(){
+        firstMove = true;
+    }
+
     @Override
     public char name() {
         return 'K';

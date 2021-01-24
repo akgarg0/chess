@@ -43,47 +43,54 @@ class Game {
         if (chessBoard.whiteTurn)
             currentPlayer = playerOnWhite;
 
-        char pieceChar = ' ';
-        boolean capture = false;
-        char xChar = ' ';
-        int y = 0;
-        boolean check = false;
-        boolean pawnPromotion = false;
-        char promotedPieceChar = ' ';
-        char ambiquityResolveChar = ' ';
+        boolean valid = false;
 
-        for (int i = 0; i < body.length(); i++) {
-            char character = body.charAt(i);
-            if (Character.isUpperCase(character)) {
-                if (pawnPromotion) {
-                    promotedPieceChar = character;
-                } else {
-                    pieceChar = character;
+        if (kCastling){
+            valid = chessBoard.kingSideCastling();
+        } else if (qCastling) {
+            valid = chessBoard.queenSideCastling();
+        } else {
+
+            char pieceChar = ' ';
+            boolean capture = false;
+            char xChar = ' ';
+            int y = 0;
+            boolean check = false;
+            boolean pawnPromotion = false;
+            char promotedPieceChar = ' ';
+            char ambiquityResolveChar = ' ';
+
+            for (int i = 0; i < body.length(); i++) {
+                char character = body.charAt(i);
+                if (Character.isUpperCase(character)) {
+                    if (pawnPromotion)
+                        promotedPieceChar = character;
+                    else
+                        pieceChar = character;
+
+                } else if (Character.isLowerCase(character)) {
+                    if (xChar != ' ') {
+                        ambiquityResolveChar = xChar;
+                    }
+                    if (character == 'x') {
+                        capture = true;
+                    } else {
+                        xChar = character;
+                    }
+                } else if (Character.isDigit(character)) {
+                    y = Character.getNumericValue(character);
+                } else if (character == '+') {
+                    check = true;
+                } else if (character == '=') {
+                    pawnPromotion = true;
                 }
-            } else if (Character.isLowerCase(character)) {
-                if (xChar != ' ') {
-                    ambiquityResolveChar = xChar;
-                }
-                if (character == 'x') {
-                    capture = true;
-                } else {
-                    xChar = character;
-                }
-            } else if (Character.isDigit(character)) {
-                y = Character.getNumericValue(character);
-            } else if (character == '+') {
-                check = true;
-            } else if (character == '=') {
-                pawnPromotion = true;
             }
+
+            if (pieceChar == ' ')
+                pieceChar = 'P';
+
+            valid = chessBoard.newMove(pieceChar, capture, xChar, y, check, pawnPromotion, promotedPieceChar, ambiquityResolveChar);
         }
-
-        if (pieceChar == ' ') {
-            pieceChar = 'P';
-        }
-
-        boolean valid = chessBoard.newMove(pieceChar, capture, xChar, y, check, pawnPromotion, promotedPieceChar, ambiquityResolveChar);
-
         return valid ? "Valid" : "Invalid";
     }
 }

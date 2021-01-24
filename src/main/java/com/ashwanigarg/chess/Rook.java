@@ -12,6 +12,10 @@ public class Rook extends Piece {
         return firstMove;
     }
 
+    void resetCastling(){
+        firstMove = true;
+    }
+
     @Override
     public char name(){
         return 'R';

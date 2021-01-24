@@ -91,11 +91,52 @@ public class Board {
     }
 
     boolean kingSideCastling(){
-        Piece king = board[4][whiteTurn?0:7].getPiece();
-        Piece Rook = board[7][whiteTurn?0:7].getPiece();
+        int kingEndX = 6;
+        int rookStartX = 7;
+        int rookEndX = 5;
+        return castling(kingEndX, rookStartX, rookEndX);
+    }
 
-        if (king.name() != 'K' || Rook.name() != 'R')
+    boolean queenSideCastling(){
+        int kingEndX = 2;
+        int rookStartX = 0;
+        int rookEndX = 3;
+        return castling(kingEndX, rookStartX, rookEndX);
+    }
+
+    private boolean castling(int kingEndX, int rookStartX, int rookEndX){
+        int y = whiteTurn?0:7;
+        int kingX = 4;
+
+        Spot kingStartSpot = board[kingX][y];
+        Spot rookStartSpot = board[rookStartX][y];
+
+        Spot kingEndSpot = board[kingEndX][y];
+        Spot rookEndSpot = board[rookEndX][y];
+
+
+        Piece kingPiece = kingStartSpot.getPiece();
+        Piece rookPiece = rookStartSpot.getPiece();
+
+        if (kingPiece.name() != 'K' || rookPiece.name() != 'R')
             return false;
+        King king = (King)kingPiece;
+        Rook rook = (Rook)rookPiece;
+
+        if (!king.canCastle() || ! rook.canCastle())
+            return false;
+
+        if (!king.canMove(this, kingStartSpot, kingEndSpot) || rook.canMove(this, rookStartSpot, rookEndSpot)){
+            king.resetCastling();
+            rook.resetCastling();
+            return false;
+        }
+
+        kingEndSpot.setPiece(king);
+        kingStartSpot.setPiece(null);
+
+        rookEndSpot.setPiece(rook);
+        rookStartSpot.setPiece(null);
 
         return true;
     }
