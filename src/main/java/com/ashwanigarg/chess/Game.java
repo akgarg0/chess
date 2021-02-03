@@ -1,27 +1,32 @@
 package com.ashwanigarg.chess;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.util.Scanner;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.util.ResourceUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+@Controller
+class Game2{
+    @RequestMapping(method=RequestMethod.GET, value = "/")
+    public String Info() {
+        return "HomePage";
+    }
+}
 
 @RestController
 class Game {
+    /**
+     * Game Class holds rest mappings exposed for interacting with server
+     */
     Board chessBoard;
     Player playerOnBlack;
     Player playerOnWhite;
-
-    @GetMapping("/")
-    String Info() {
-        return "Would you like to have a game of CHESS.\n" +
-                "Application: https://ak-chess.herokuapp.com/\n" +
-                "Repository: https://github.com/akgarg0/chess\n" +
-                "Online Resume: https://www.ashwanigarg.com\n" +
-                "*Note:*\n" +
-                "*1. First Request to Application may take some time.*\n" +
-                "*2. All the requests are required to sent on 'post' method with body as 'plain text'*\n";
-
-    }
 
     @PostMapping(value = "/", consumes = "text/plain", produces = "text/plain")
     String Play(@RequestBody String body) {
@@ -29,6 +34,7 @@ class Game {
         boolean qCastling = false;
         Player currentPlayer = playerOnBlack;
 
+        // Controlling move and chessboard strategy as per body
         switch (body) {
             case "START":
                 chessBoard = new Board();
@@ -43,14 +49,16 @@ class Game {
                 break;
         }
 
-        if (chessBoard == null) {
+        //Checking if game has been started
+        if (chessBoard == null || chessBoard.isWin) {
             return "Kindly Start Game!";
         }
 
         if (chessBoard.whiteTurn)
             currentPlayer = playerOnWhite;
 
-        boolean valid = false;
+        // valid boolean holds value for move
+        boolean valid;
 
         if (kCastling){
             valid = chessBoard.kingSideCastling();
@@ -65,19 +73,24 @@ class Game {
             boolean check = false;
             boolean pawnPromotion = false;
             char promotedPieceChar = ' ';
-            char ambiquityResolveChar = ' ';
+            char ambiguityResolveChar = ' ';
 
+            // Parsing each character of move as per notations of chess
+            // as mentioned on https://www.ichess.net/blog/chess-notation/
             for (int i = 0; i < body.length(); i++) {
                 char character = body.charAt(i);
+
                 if (Character.isUpperCase(character)) {
+                    // Upper case character can be perceived as pieces/characters on chess board
                     if (pawnPromotion)
                         promotedPieceChar = character;
                     else
                         pieceChar = character;
 
                 } else if (Character.isLowerCase(character)) {
+                    // Lower case character can be perceived as file/x(graph) on board
                     if (xChar != ' ') {
-                        ambiquityResolveChar = xChar;
+                        ambiguityResolveChar = xChar;
                     }
                     if (character == 'x') {
                         capture = true;
@@ -85,19 +98,26 @@ class Game {
                         xChar = character;
                     }
                 } else if (Character.isDigit(character)) {
+                    // Digits notate ranks/y(graph) on a board
                     y = Character.getNumericValue(character);
                 } else if (character == '+') {
+                    // Positive sign notates a check
                     check = true;
                 } else if (character == '=') {
+                    // Equals to sign notates to promote a pawn
                     pawnPromotion = true;
                 }
             }
 
+            // Empty character for piece, notated piece to be a Pawn
             if (pieceChar == ' ')
                 pieceChar = 'P';
 
-            valid = chessBoard.newMove(pieceChar, capture, xChar, y, check, pawnPromotion, promotedPieceChar, ambiquityResolveChar);
+            // Validating and making a move on chessboard as per request and player turn
+            valid = chessBoard.newMove(pieceChar, capture, xChar, y, check, pawnPromotion, promotedPieceChar, ambiguityResolveChar);
         }
+        if (chessBoard.isWin)
+            return "Win";
         return valid ? "Valid" : "Invalid";
     }
 }

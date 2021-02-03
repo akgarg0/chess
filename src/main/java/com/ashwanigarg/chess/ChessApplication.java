@@ -11,3 +11,13 @@ public class ChessApplication {
 	}
 
 }
+
+/**
+ * Chess Gaming server is a gaming server helps two players to play chess,
+ * with each other anywhere across the world.
+ *
+ * @Author 		- Ashwani Garg
+ * @Version		- 1.1
+ * @Since 		- 24 Jan 2021
+ *  Kindly visit <a href="https://www.ashwanigarg.com/">www.ashwanigarg.com<a/> for more information
+ */

@@ -5,7 +5,10 @@ import java.util.stream.IntStream;
 public class Board {
     Spot[][] board;
     boolean whiteTurn;
+    boolean isWin;
 
+    // piece is a static method that initiates and returns
+    // a chess board piece/character based on their name
     public static Piece piece(char name, boolean white){
         switch (name){
             case 'K':
@@ -25,6 +28,7 @@ public class Board {
         return null;
     }
 
+    // initPiece method initiates default piece based on spot on board
     public static Piece initPiece(int x,int y){
         boolean white = false;
         boolean pawnRow = false;
@@ -71,6 +75,7 @@ public class Board {
         return null;
     }
 
+    // fileToNumber function converts file(a,b,c....) to respective digits for x-axis positioning
     static int fileToNumber(char file){
         int number = file - 96;
         if (number < 1 || number > 8 ){
@@ -205,6 +210,11 @@ public class Board {
 
         if (!canMove){
             return false;
+        }
+
+        // If captured piece is king, Player wins the game
+        if (endSpot.getPiece().name() == 'K') {
+            isWin = true;
         }
 
         endSpot.setPiece(startSpot.getPiece());
